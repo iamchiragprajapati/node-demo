@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+    <header>
+        <%- include('./partials/header.ejs'); %>
+    </header>
+    <main>
+        <h2>Welcome to the about</h2>
+        <p> Here is a User data</p>
+        <p>Name:
+            <span>
+                <%= user.name %>
+            </span>
+        </p>
+        <p>email:
+            <span>
+                <%= user.email %>
+            </span>
+        </p>
+        <ul>
+            <% user.technologies.forEach((item)=> { %>
+                <li>
+                    <%= item %>
+                </li>
+                <% }); %>
+        </ul>
+    </main>
+</body>
