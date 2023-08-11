@@ -1,38 +1,20 @@
 const express = require("express");
 const app = express();
 const port = 4100;
+const mongoose = require('mongoose');
+const empModel = require('./models/employee.model');
+const userValidator = require('./validators/user_validator');
 
 app.use(express.json());
-
-
+app.use(express.urlencoded({ extended: false }))
 app.set('view engine', 'ejs');
 
-const employeeData = [
-    {
-        name: 'user1',
-        designation: 'Software engineer',
-        id: 1
-    },
-    {
-        name: 'user2',
-        designation: 'Senior software engineer',
-        id: 2
-    }, {
-        name: 'user3',
-        designation: 'Tech Lead',
-        id: 3
-    }, {
-        name: 'user4',
-        designation: 'Team Lead',
-        id: 4
-    }
-]
+mongoose.connect('mongodb://localhost:27017/e-commerce', {
+    useNewUrlParser: true,
+})
 
 app.get('/', (req, res) => {
-    // Used for send normal text as response
-    // res.send('Hello world from get....');
-
-    // Used for send html file as response
+    // for send html file as response
     res.render('pages/index');
 })
 
@@ -43,57 +25,78 @@ app.get('/about', (req, res) => {
         email: 'jack@mail.com',
         technologies: ['Angular', 'React', 'Node', 'Laravel']
     }
-    // res.send('Hello world from get....');
     res.render('pages/about', { user });
 })
 
 app.get('/employee', async (req, res) => {
-    res.json(employeeData);
+    try {
+        const users = await empModel.find();
+        res.send({ data: users, status: 200, message: 'Data getting successfully' })
+    } catch (err) {
+        res.send({ error: err, status: 400, message: 'Something went wrong' });
+    }
 })
 
-app.get('/employee/:id', (req, res) => {
-    const employee = employeeData.find((emp) => emp.id == req.params.id);
-    if (employee) {
-        res.json(employee);
-    } else {
-        res.send('User not found');
+app.get('/employee/:id', async (req, res) => {
+    try {
+        const data = await empModel.findOne({ _id: req.params.id });
+        if (!data) {
+            res.send({ data, status: 404, message: 'user not found' });
+        }
+        return res.send({ data, status: 200, message: 'User getting successfully' });
+
+    } catch (error) {
+        res.send({ error: err, status: 400, message: 'Something went wrong' });
     }
 })
 
 app.post('/employee', async (req, res) => {
-    if (req.body.id) {
-        employeeData.push(req.body);
-        res.json(employeeData);
-    } else {
-        res.send('Please enter id');
+    try {
+        const { error, value } = await userValidator.validateUser(req.body);
+        if (error) {
+            res.send({ error: error.details, status: 400, message: error.details.map((x) => x.message).join(", ") });
+        } else {
+            const empData = new empModel({
+                name: req.body.name,
+                designation: req.body.designation,
+            });
+            const dataToSave = await empData.save();
+            res.send({ data: dataToSave, status: 200, message: 'User added successfully' });
+        }
+    } catch (error) {
+        console.log(error, 'errror');
+        res.send({ error: error.details, status: 400, message: 'Something went wrong' });
     }
 })
 
-app.put('/employee', (req, res) => {
-    if (req.body.id) {
-        const updatedEmp = employeeData.findIndex((emp) => emp.id == req.body.id);
-        if (updatedEmp == -1) {
-            res.send('User not found');
+app.put('/employee/:id', async (req, res) => {
+    try {
+        const updatedUser = await empModel.findOneAndUpdate(
+            { _id: req.params.id },
+            { ...req.body },
+            { new: true }
+        );
+        if (updatedUser) {
+            res.send({ data: updatedUser, status: 200, message: 'User updated successfully' });
         } else {
-            employeeData[updatedEmp] = req.body;
-            res.json(employeeData[updatedEmp]);
+            res.send({ data: [], status: 400, message: 'User not found' });
         }
-    } else {
-        res.send('Please enter id');
+    } catch (error) {
+        res.send({ error: error, status: 400, message: 'Something went wrong' });
     }
 })
 
-app.delete('/employee/:id', (req, res) => {
-    if (req.params.id) {
-        const empId = employeeData.findIndex((emp) => emp.id == req.params.id);
-        if (empId == -1) {
-            res.send('User not found');
+app.delete('/employee/:id', async (req, res) => {
+    try {
+        const data = await empModel.findByIdAndDelete(req.params.id);
+        if (data) {
+            res.send({ data: data, status: 200, message: 'User deleted successfully' });
         } else {
-            employeeData.splice(empId, 1);
-            res.json(employeeData);
+            res.send({ data: [], status: 400, message: 'User not found' });
         }
-    } else {
-        res.send('Please enter id');
+
+    } catch (error) {
+        res.send({ error: error, status: 400, message: 'Something went wrong' });
     }
 })
 
