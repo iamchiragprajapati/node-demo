@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = 4100;
 const connection = require('./config/connection');
-const route = require('./routes/route');
+const router = require('./routes/index');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }))
@@ -25,7 +25,7 @@ app.get('/about', (req, res) => {
     res.render('pages/about', { user });
 })
 
-app.use('/employee', route);
+app.use(router);
 
 app.listen(port, () => {
     console.log(`server is running on ${port}`);
