@@ -7,7 +7,7 @@ async function getEmployees(req, res) {
         const users = await empModel.find();
         res.send({ data: users, status: 200, message: 'Data getting successfully' })
     } catch (err) {
-        res.send({ error: err, status: 400, message: 'Something went wrong' });
+        res.send({ error: err, status: 400, message: 'Bad request' });
     }
 }
 
@@ -25,7 +25,7 @@ async function createEmployee(req, res) {
             res.send({ data: dataToSave, status: 200, message: 'User added successfully' });
         }
     } catch (error) {
-        res.send({ error: error.details, status: 400, message: 'Something went wrong' });
+        res.send({ error: error.details, status: 400, message: 'Bad request' });
     }
 }
 
@@ -38,7 +38,7 @@ async function getEmployee(req, res) {
         return res.send({ data, status: 200, message: 'User getting successfully' });
 
     } catch (error) {
-        res.send({ error: err, status: 400, message: 'Something went wrong' });
+        res.send({ error: err, status: 400, message: 'Bad request' });
     }
 }
 
@@ -55,7 +55,7 @@ async function updateEmployee(req, res) {
             res.send({ data: [], status: 400, message: 'User not found' });
         }
     } catch (error) {
-        res.send({ error: error, status: 400, message: 'Something went wrong' });
+        res.send({ error: error, status: 400, message: 'Bad request' });
     }
 }
 
@@ -69,7 +69,7 @@ async function deleteEmployee(req, res) {
         }
 
     } catch (error) {
-        res.send({ error: error, status: 400, message: 'Something went wrong' });
+        res.send({ error: error, status: 400, message: 'Bad request' });
     }
 }
 
