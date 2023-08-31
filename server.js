@@ -1,9 +1,11 @@
 const express = require("express");
 const app = express();
-const port = 4100;
+const cors = require('cors');
 const connection = require('./config/connection');
 const router = require('./routes/index');
+require('dotenv').config();
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }))
 app.set('view engine', 'ejs');
@@ -25,8 +27,8 @@ app.get('/about', (req, res) => {
     res.render('pages/about', { user });
 })
 
-app.use(router);
+app.use('/api', router);
 
-app.listen(port, () => {
-    console.log(`server is running on ${port}`);
+app.listen(process.env.PORT, () => {
+    console.log(`server is running on ${process.env.PORT}`);
 })

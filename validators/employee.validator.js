@@ -1,6 +1,6 @@
 const joi = require('joi');
 
-const userSchema = joi.object({
+const employeeSchema = joi.object({
     name: joi.string().required().min(2).messages({
         "string.base": "Name must be a string",
         "string.empty": "Name is required",
@@ -16,7 +16,7 @@ const userSchema = joi.object({
 
 
 function validateUser(userData) {
-    return userSchema.validate(userData);
+    return employeeSchema.validate(userData);
 }
 
 
