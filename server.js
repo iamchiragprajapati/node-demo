@@ -3,11 +3,14 @@ const app = express();
 const cors = require('cors');
 const connection = require('./config/connection');
 const router = require('./routes/index');
+const path = require('path');
 require('dotenv').config();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: false }));
+app.set('views', path.join(__dirname, 'views'));
+
 app.set('view engine', 'ejs');
 
 connection.dbConnection();
