@@ -1,6 +1,7 @@
 const userModel = require('../models/user.model');
 const userValidator = require('../validators/user.validator');
 const jwt = require('jsonwebtoken');
+const mailer = require('../helpers/email');
 
 async function userRegister(req, res) {
     try {
@@ -19,7 +20,16 @@ async function userRegister(req, res) {
                     password: value.password
                 })
                 const user = await userData.save();
-                res.status(200).send({ data: user, message: 'User registered successfully' });
+                //send mail 
+                await mailer.sendMail(
+                    value.email,
+                    {
+                        name: value.name,
+                        email: value.email,
+                        password: value.password
+                    }
+                )
+                res.status(200).send({ data: user, message: 'User registered successfully, Please check you mail' });
             }
         }
     } catch (err) {
