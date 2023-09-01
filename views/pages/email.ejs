@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login Credentials</title>
+
+    <style type="text/css">
+        body * {
+            font-family: 'Montserrat', sans-serif;
+            box-sizing: border-box;
+        }
+
+        .main-body {
+            background-color: #f6f6f6;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+        }
+
+
+        .email-wrapper {
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            width: 520px;
+            padding: 10px;
+        }
+
+        .email-subject {
+            background-color: #15335f;
+            color: #fff;
+            padding: 10px;
+            justify-content: center;
+            display: flex;
+        }
+
+        .receiver-name {
+            font-size: 14px;
+        }
+
+        .credentials-container {
+            margin: 20px 0;
+        }
+
+        .credential {
+            font-weight: 700;
+            font-size: 14px;
+
+            & span {
+                font-weight: normal;
+            }
+        }
+
+        .info-msg {
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-body">
+        <div class="email-wrapper">
+            <div>
+                <h1>Company Logo</h1>
+            </div>
+            <div class="email-subject">
+                <h3>Login Credentials</h3>
+            </div>
+            <div class="email-content">
+                <p class="receiver-name">
+                    Dear <span class="credential">
+                        <%=name%>
+                    </span>
+                </p>
+                <p class="info-msg">You have been registered with Employee Management.</p>
+                <p class="info-msg">Below are your login credentials.</p>
+
+                <div class="credentials-container">
+                    <p class="credential">Email:<span>
+                            <%=email%>
+                        </span></p>
+                    <p class="credential">Password: <span>
+                            <%=password%>
+                        </span></p>
+                </div>
+                <p>Thank you</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
