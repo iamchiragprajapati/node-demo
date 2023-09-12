@@ -15,7 +15,8 @@ async function verifyToken(req, res, next) {
             throw error;
         }
     } catch (error) {
-        return res.status(401).json({ error, message: error.message });
+        console.log('jwt error: ', error);
+        return res.status(401).json({ error, message: 'Token is expired, Please Login again' });
     }
 }
 

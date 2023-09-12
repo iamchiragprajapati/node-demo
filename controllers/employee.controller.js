@@ -3,7 +3,42 @@ const empValidator = require('../validators/employee.validator');
 
 async function getEmployees(req, res) {
     try {
-        const users = await empModel.find();
+        // const users = await empModel.find();
+
+        // getting specific data with help of aggregation
+        const users = await empModel.aggregate([
+            {
+                $project: {
+                    name: 1,
+                    designation: 1,
+                    yearsOfExperience: 1
+                }
+            },
+            {
+                $sort: {
+                    yearsOfExperience: -1
+                }
+            },
+            // {
+            //     $addFields: { totalNo: { $count: 'total_documents' } }
+            // }
+            {
+                $group: {
+                    _id: null,
+                    users: { $push: "$$ROOT" },
+                    totalNo: { $sum: 1 }
+                }
+            },
+            {
+                $unwind: "$users"
+            },
+            {
+                $replaceRoot: { newRoot: "$users" }
+            }
+            // Here is a example of addfields aggregration to add new fields
+            // { $addFields: { foundation_year: 1218 } }
+        ])
+
         res.status(200).send({ data: users, message: 'Data getting successfully' })
     } catch (err) {
         res.status(400).send({ error: err, message: 'Bad request' });
@@ -15,14 +50,19 @@ async function createEmployee(req, res) {
         const { error, value } = await empValidator.validateUser(req.body);
         if (error) {
             res.status(400).send({ error: error.details, message: error.details.map((x) => x.message).join(", ") });
-
         } else {
-            const empData = new empModel({
-                name: value.name,
-                designation: value.designation,
-            });
-            const dataToSave = await empData.save();
-            res.status(200).json({ data: dataToSave, message: 'User added successfully' });
+            const existUser = await empModel.findOne({ name: req.body.name.trim() });
+            if (existUser) {
+                res.status(400).send({ message: 'User already exists' });
+            } else {
+                const empData = new empModel({
+                    name: value.name.trim(),
+                    designation: value.designation.trim(),
+                    yearsOfExperience: value.yearsOfExperience
+                });
+                const dataToSave = await empData.save();
+                res.status(200).json({ data: dataToSave, message: 'User added successfully' });
+            }
         }
     } catch (error) {
         res.status(400).json({ error: error.details, message: 'Bad request' });
@@ -39,7 +79,6 @@ async function getEmployee(req, res) {
         res.status(200).json({ data, message: 'User getting successfully' });
 
     } catch (error) {
-        console.log('error======>', error);
         res.status(400).send({ error: error, message: 'Bad request' });
     }
 }
@@ -69,7 +108,6 @@ async function updateEmployee(req, res) {
 async function deleteEmployee(req, res) {
     try {
         const emp = await empModel.findOne({ _id: req.params.id });
-        console.log('emp========>', emp);
         if (!emp) {
             return res.status(400).json({ message: 'User not found' });
         }

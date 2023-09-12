@@ -11,6 +11,11 @@ const employeeSchema = joi.object({
         "string.base": "Name must be a string",
         "string.empty": "Name is required",
         "any.required": "Name is required",
+    }),
+    yearsOfExperience: joi.number().required().messages({
+        "number.base": "Experience must be a number",
+        "number.empty": "Experience is required",
+        "any.required": "Experience is required",
     })
 })
 

@@ -29,7 +29,7 @@ async function userRegister(req, res) {
                         password: value.password
                     }
                 )
-                res.status(200).send({ data: user, message: 'User registered successfully, Please check you mail' });
+                res.status(200).send({ data: user, message: 'User registered successfully, Please check your mail' });
             }
         }
     } catch (err) {
@@ -40,7 +40,7 @@ async function userRegister(req, res) {
 async function checkUserExist(user) {
     try {
         const userFind = await userModel.find({ email: user.email });
-        return userFind.length ? true : false;
+        return !!userFind.length;
     } catch (err) {
         console.log(err);
     }
@@ -52,7 +52,7 @@ async function userLogin(req, res) {
         if (user.length) {
             const validUser = validateUser(user[0], req.body);
             if (validUser) {
-                const token = await jwt.sign(req.body.email, process.env.JWT_SECRET_KEY);
+                const token = await jwt.sign({ data: req.body.email }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.EXPIRE_TIME });
                 res.status(200).send({ data: req.body, token, message: 'login successfully' });
             } else {
                 res.status(400).json({ message: 'Invalid credentials' });
@@ -62,12 +62,11 @@ async function userLogin(req, res) {
         }
     } catch (err) {
         res.status(400).json({ error: err, message: 'Bad request' });
-
     }
 }
 
 function validateUser(userDetails, reqParams) {
-    return userDetails.password === reqParams.password ? true : false;
+    return userDetails.password === reqParams.password;
 }
 
 module.exports = { userRegister, userLogin }
