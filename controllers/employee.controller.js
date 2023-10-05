@@ -118,4 +118,13 @@ async function deleteEmployee(req, res) {
     }
 }
 
-module.exports = { getEmployees, getEmployee, createEmployee, updateEmployee, deleteEmployee };
+async function uploadProfile(req, res) {
+    console.log(req);
+    try {
+        res.status(200).json({ message: 'Profile saved successfully' });
+    } catch (error) {
+        res.status(400).send({ error: error, message: 'Bad request' });
+    }
+}
+
+module.exports = { getEmployees, getEmployee, createEmployee, updateEmployee, deleteEmployee, uploadProfile };
