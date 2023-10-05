@@ -53,7 +53,7 @@ async function createEmployee(req, res) {
         } else {
             const existUser = await empModel.findOne({ name: req.body.name.trim() });
             if (existUser) {
-                res.status(400).send({ message: 'User already exists' });
+                res.status(400).send({ message: 'Employee already exists' });
             } else {
                 const empData = new empModel({
                     name: value.name.trim(),
@@ -61,7 +61,7 @@ async function createEmployee(req, res) {
                     yearsOfExperience: value.yearsOfExperience
                 });
                 const dataToSave = await empData.save();
-                res.status(200).json({ data: dataToSave, message: 'User added successfully' });
+                res.status(200).json({ data: dataToSave, message: 'Employee added successfully' });
             }
         }
     } catch (error) {
@@ -74,9 +74,9 @@ async function getEmployee(req, res) {
     try {
         const data = await empModel.findOne({ _id: req.params.id });
         if (!data) {
-            res.status(400).json({ data, message: 'user not found' });
+            res.status(400).json({ data, message: 'Employee not found' });
         }
-        res.status(200).json({ data, message: 'User getting successfully' });
+        res.status(200).json({ data, message: 'Employee details getting successfully' });
 
     } catch (error) {
         res.status(400).send({ error: error, message: 'Bad request' });
@@ -95,9 +95,9 @@ async function updateEmployee(req, res) {
                 { new: true }
             );
             if (updatedUser) {
-                res.status(200).send({ data: updatedUser, message: 'User updated successfully' });
+                res.status(200).send({ data: updatedUser, message: 'Employee updated successfully' });
             } else {
-                res.status(400).send({ data: [], message: 'User not found' });
+                res.status(400).send({ data: [], message: 'Employee not found' });
             }
         }
     } catch (error) {
@@ -109,10 +109,10 @@ async function deleteEmployee(req, res) {
     try {
         const emp = await empModel.findOne({ _id: req.params.id });
         if (!emp) {
-            return res.status(400).json({ message: 'User not found' });
+            return res.status(400).json({ message: 'Employee not found' });
         }
         const result = await empModel.deleteOne({ _id: req.params.id });
-        res.status(200).send({ data: result, message: 'User deleted successfully' });
+        res.status(200).send({ data: result, message: 'Employee deleted successfully' });
     } catch (error) {
         res.status(400).send({ error: error, message: 'Bad request' });
     }
