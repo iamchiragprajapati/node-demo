@@ -48,12 +48,16 @@ async function checkUserExist(user) {
 
 async function userLogin(req, res) {
     try {
-        const user = await userModel.find({ email: req.body.email });
-        if (user.length) {
-            const validUser = validateUser(user[0], req.body);
+        const user = await userModel.findOne({ email: req.body.email });
+        if (user) {
+            const validUser = validateUser(user, req.body);
             if (validUser) {
                 const token = await jwt.sign({ data: req.body.email }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.EXPIRE_TIME });
-                res.status(200).send({ data: req.body, token, message: 'login successfully' });
+                const userDetails = {
+                    ...req.body,
+                    name: user.name
+                }
+                res.status(200).send({ data: userDetails, token, message: 'login successfully' });
             } else {
                 res.status(400).json({ message: 'Invalid credentials' });
             }
