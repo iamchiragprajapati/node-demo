@@ -1,5 +1,7 @@
 const empModel = require('../models/employee.model');
+const profileModel = require('../models/profile.model');
 const empValidator = require('../validators/employee.validator');
+const fs = require('fs');
 
 async function getEmployees(req, res) {
     try {
@@ -119,12 +121,41 @@ async function deleteEmployee(req, res) {
 }
 
 async function uploadProfile(req, res) {
-    console.log(req);
     try {
-        res.status(200).json({ message: 'Profile saved successfully' });
+        // const imgPath = 'uploads/' + req.file.filename;
+        // const imageBuffer = fs.readFileSync('./uploads/' + req.file.filename);
+        console.log(req);
+        const profileData = new profileModel({
+            email: req.body.email.trim(),
+            name: req.body.name.trim(),
+            profilePic: {
+                data: req.file.buffer,
+                contentType: req.file.mimetype
+            }
+        });
+        const savedProfileData = await profileData.save();
+        res.status(200).json({ data: savedProfileData, message: 'Profile saved successfully' });
     } catch (error) {
         res.status(400).send({ error: error, message: 'Bad request' });
     }
 }
 
-module.exports = { getEmployees, getEmployee, createEmployee, updateEmployee, deleteEmployee, uploadProfile };
+async function getProfile(req, res) {
+    console.log('body=>', req.body);
+    try {
+        const profileData = await profileModel.findOne({ email: 'mail1@mail.com' });
+        res.contentType('image/jpeg'); // Set the appropriate content type
+        console.log(profileData);
+        // const fs = require('fs');
+        // const imageStream = fs.createReadStream(image.profilePic);
+        // imageStream.pipe(res);
+        res.send(profileData.profilePic);
+        fs.writeFileSync('./uploads/abc1.jpeg', profileData.profilePic);
+        // res.status(200).json({ data: [], message: 'Employee details getting successfully' });
+
+    } catch (error) {
+        console.log('imgerror=>', error);
+        res.status(400).send({ error: error, message: 'Bad request' });
+    }
+}
+module.exports = { getEmployees, getEmployee, createEmployee, updateEmployee, deleteEmployee, uploadProfile, getProfile };

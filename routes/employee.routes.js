@@ -9,7 +9,6 @@ router.post('/', jwt.verifyToken, empController.createEmployee);
 router.get('/:id', jwt.verifyToken, empController.getEmployee);
 router.put('/:id', jwt.verifyToken, empController.updateEmployee);
 router.delete('/:id', jwt.verifyToken, empController.deleteEmployee);
-router.post('/profile', fileUpload.upload, empController.uploadProfile);
-
+router.post('/profile', jwt.verifyToken, fileUpload.upload, empController.uploadProfile);
 
 module.exports = router;

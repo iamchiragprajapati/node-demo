@@ -11,6 +11,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.set('views', path.join(__dirname, 'views'));
 
+app.use('/uploads', express.static('uploads'));
+
 app.set('view engine', 'ejs');
 
 connection.dbConnection();
