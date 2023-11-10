@@ -1,5 +1,8 @@
 const empModel = require('../models/employee.model');
+const profileModel = require('../models/profile.model');
+const userModel = require('../models/user.model');
 const empValidator = require('../validators/employee.validator');
+const fs = require('fs');
 
 async function getEmployees(req, res) {
     try {
@@ -118,4 +121,68 @@ async function deleteEmployee(req, res) {
     }
 }
 
-module.exports = { getEmployees, getEmployee, createEmployee, updateEmployee, deleteEmployee };
+async function uploadProfile(req, res) {
+    try {
+        const base64Img = fs.readFileSync(req.file.path).toString('base64');
+        const empData = new profileModel({
+            name: req.body.name.trim(),
+            img: base64Img
+        });
+
+        const savedProfile = await empData.save();
+        res.status(200).json({ data: savedProfile, message: 'Profile saved successfully' });
+    } catch (error) {
+        res.status(400).send({ error: error, message: 'Bad request' });
+    }
+}
+
+async function getProfileImg(req, res) {
+    try {
+        const data = await profileModel.findOne({ _id: req.params.id });
+        if (!data) {
+            res.status(400).json({ data, message: 'profile not found' });
+            return;
+        }
+        res.status(200).json({ data, message: 'Profile details getting successfully' });
+
+    } catch (error) {
+        res.status(400).send({ error: error, message: 'Bad request' });
+    }
+}
+
+async function getProfile(req, res) {
+    try {
+        const data = await userModel.findOne({ _id: req.params.id });
+        if (!data) {
+            res.status(400).json({ data, message: 'user not found' });
+            return;
+        }
+        res.status(200).json({ data, message: 'user details getting successfully' });
+
+    } catch (error) {
+        res.status(400).send({ error: error, message: 'Bad request' });
+    }
+}
+
+
+async function getPaginationData(req, res) {
+    try {
+        if (!req.query.limit) {
+            res.status(400).send({ message: 'query params are required' });
+        }
+        const limit = parseInt(req.query.limit || 10);
+        const offset = parseInt(req.query.skip || 1);
+        const totalItems = await empModel.countDocuments();
+        const filter = req.query.search;
+        const sortField = req.query.sortBy;
+        let sort = {};
+        sort[sortField] = req.query.sort === 'asc' ? 1 : -1;
+        const users = await empModel.find({ name: { $regex: filter || '', $options: 'i' } }).skip((offset - 1) * limit).limit(limit).sort(sort);
+        res.status(200).json({ data: users, message: 'Data get successfully', totalCount: totalItems });
+    } catch (error) {
+        console.log(error);
+        res.status(400).send({ error: error, message: 'Bad request' });
+    }
+}
+
+module.exports = { getEmployees, getEmployee, createEmployee, updateEmployee, deleteEmployee, uploadProfile, getPaginationData, getProfile, getProfileImg };
