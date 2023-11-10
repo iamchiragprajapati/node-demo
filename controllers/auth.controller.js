@@ -11,7 +11,7 @@ async function userRegister(req, res) {
         } else {
             const userExist = await checkUserExist(value);
             if (userExist) {
-                res.status(400).json({ message: 'This email address is already used by another user' })
+                res.status(400).json({ message: 'This email address is already used by another user' });
             } else {
                 const userData = new userModel({
                     email: value.email,
@@ -53,11 +53,7 @@ async function userLogin(req, res) {
             const validUser = validateUser(user, req.body);
             if (validUser) {
                 const token = await jwt.sign({ data: req.body.email }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.EXPIRE_TIME });
-                const userDetails = {
-                    ...req.body,
-                    name: user.name
-                }
-                res.status(200).send({ data: userDetails, token, message: 'login successfully' });
+                res.status(200).send({ data: user, token, message: 'login successfully' });
             } else {
                 res.status(400).json({ message: 'Invalid credentials' });
             }
